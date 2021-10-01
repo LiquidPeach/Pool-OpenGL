@@ -160,6 +160,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Pool.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Stick.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\vendor\stb\stb_image.cpp" />
     <ClCompile Include="src\VertexArray.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\Pool.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Stick.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\vendor\stb\stb_image.h" />
     <ClInclude Include="src\VertexArray.h" />
@@ -183,11 +185,12 @@
     <None Include="src\shaders\defaultVert.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\images\blackBall.png" />
-    <Image Include="src\images\blueBall.png" />
-    <Image Include="src\images\redBall.png" />
-    <Image Include="src\images\table.png" />
-    <Image Include="src\images\whiteBall.png" />
+    <Image Include="res\blackBall.png" />
+    <Image Include="res\blueBall.png" />
+    <Image Include="res\redBall.png" />
+    <Image Include="res\stick.png" />
+    <Image Include="res\table.png" />
+    <Image Include="res\whiteBall.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

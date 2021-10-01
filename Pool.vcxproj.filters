@@ -48,6 +48,9 @@
     <ClCompile Include="src\Ball.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Stick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Texture.h">
@@ -83,25 +86,31 @@
     <ClInclude Include="src\Ball.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Stick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shaders\defaultFrag.frag" />
     <None Include="src\shaders\defaultVert.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="src\images\blackBall.png">
+    <Image Include="res\blackBall.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\images\blueBall.png">
+    <Image Include="res\blueBall.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\images\redBall.png">
+    <Image Include="res\redBall.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\images\table.png">
+    <Image Include="res\table.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="src\images\whiteBall.png">
+    <Image Include="res\whiteBall.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\stick.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

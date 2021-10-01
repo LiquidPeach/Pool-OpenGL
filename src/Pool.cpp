@@ -1,5 +1,6 @@
 #include "Pool.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include <GLFW/glfw3.h>
 #include <math.h>
 
 #include <iostream>
@@ -42,27 +43,30 @@ void Pool::InitGame() // Ball setup
 	float radius = size / 2.0f;
 	
 	// Row 1
-	balls[0].CreateBall("src/images/redBall.png", radius, xPos, yPos, BallColor::RED);
+	m_Balls[0].CreateBall("res/redBall.png", radius, xPos, yPos, BallColor::RED);
 	// Row 2
-	balls[1].CreateBall("src/images/blueBall.png", radius, xPos + size, yPos - radius, BallColor::BLUE);
-	balls[2].CreateBall("src/images/redBall.png",  radius, xPos + size, yPos + radius, BallColor::RED);
+	m_Balls[1].CreateBall("res/blueBall.png", radius, xPos + size, yPos - radius, BallColor::BLUE);
+	m_Balls[2].CreateBall("res/redBall.png",  radius, xPos + size, yPos + radius, BallColor::RED);
 	// Row 3 with Black Ball
-	balls[3].CreateBall("src/images/blueBall.png", radius, xPos + (size * 2), yPos - (radius * 2), BallColor::BLUE);
-	balls[4].CreateBall("src/images/blackBall.png",radius, xPos + (size * 2), yPos, BallColor::BLACK);
-	balls[5].CreateBall("src/images/redBall.png",  radius, xPos + (size * 2), yPos + (radius * 2), BallColor::RED);
+	m_Balls[3].CreateBall("res/blueBall.png", radius, xPos + (size * 2), yPos - (radius * 2), BallColor::BLUE);
+	m_Balls[4].CreateBall("res/blackBall.png",radius, xPos + (size * 2), yPos, BallColor::BLACK);
+	m_Balls[5].CreateBall("res/redBall.png",  radius, xPos + (size * 2), yPos + (radius * 2), BallColor::RED);
 	// Row 4
-	balls[6].CreateBall("src/images/blueBall.png", radius, xPos + (size * 3), yPos - (radius * 3), BallColor::BLUE);
-	balls[7].CreateBall("src/images/redBall.png",  radius, xPos + (size * 3), yPos - radius, BallColor::RED);
-	balls[8].CreateBall("src/images/blueBall.png", radius, xPos + (size * 3), yPos + radius, BallColor::BLUE);
-	balls[9].CreateBall("src/images/redBall.png",  radius, xPos + (size * 3), yPos + (radius * 3), BallColor::RED);
+	m_Balls[6].CreateBall("res/blueBall.png", radius, xPos + (size * 3), yPos - (radius * 3), BallColor::BLUE);
+	m_Balls[7].CreateBall("res/redBall.png",  radius, xPos + (size * 3), yPos - radius, BallColor::RED);
+	m_Balls[8].CreateBall("res/blueBall.png", radius, xPos + (size * 3), yPos + radius, BallColor::BLUE);
+	m_Balls[9].CreateBall("res/redBall.png",  radius, xPos + (size * 3), yPos + (radius * 3), BallColor::RED);
 	// Row 5
-	balls[10].CreateBall("src/images/redBall.png", radius, xPos + (size * 4), yPos - (radius * 4), BallColor::RED);
-	balls[11].CreateBall("src/images/blueBall.png",radius, xPos + (size * 4), yPos - (radius * 2), BallColor::BLUE);
-	balls[12].CreateBall("src/images/blueBall.png",radius, xPos + (size * 4), yPos, BallColor::BLUE);
-	balls[13].CreateBall("src/images/redBall.png", radius, xPos + (size * 4), yPos + (radius * 2), BallColor::RED);
-	balls[14].CreateBall("src/images/blueBall.png",radius, xPos + (size * 4), yPos + (radius * 4), BallColor::BLUE);
+	m_Balls[10].CreateBall("res/redBall.png", radius, xPos + (size * 4), yPos - (radius * 4), BallColor::RED);
+	m_Balls[11].CreateBall("res/blueBall.png",radius, xPos + (size * 4), yPos - (radius * 2), BallColor::BLUE);
+	m_Balls[12].CreateBall("res/blueBall.png",radius, xPos + (size * 4), yPos, BallColor::BLUE);
+	m_Balls[13].CreateBall("res/redBall.png", radius, xPos + (size * 4), yPos + (radius * 2), BallColor::RED);
+	m_Balls[14].CreateBall("res/blueBall.png",radius, xPos + (size * 4), yPos + (radius * 4), BallColor::BLUE);
 	// White ball
-	balls[15].CreateBall("src/images/whiteBall.png", radius, 100.0f, yPos, BallColor::WHITE);
+	m_Balls[15].CreateBall("res/whiteBall.png", radius, 180.0f, yPos, BallColor::WHITE);
+	
+	m_Stick.CreateGameObject("res/stick.png", 650.0f, 25.0f);
+	m_Stick.SetPosition(m_WindowWidth/2, yPos); // TODO Set stick to appropriate position
 }
 
 void Pool::WallCollision(Ball& ball)
@@ -85,7 +89,7 @@ void Pool::BallCollision(Ball& ballA, Ball& ballB) // Subtract the distance betw
 
 	if (magDist <= R) 
 	{
-		float k = 1.0f;
+		float k = 10.0f;
 		forceA = k * (magDist - R) * glm::normalize(dist);
 		forceB = -1.0f * forceA;
 	}
@@ -95,11 +99,20 @@ void Pool::BallCollision(Ball& ballA, Ball& ballB) // Subtract the distance betw
 
 void Pool::UpdatePosition(Ball& ball, float deltaTime)
 {
+	float magMomen = sqrt( (ball.m_Momen.x * ball.m_Momen.x) + (ball.m_Momen.y * ball.m_Momen.y) );
+	if (magMomen < 2.6f)
+		ball.m_Momen = { 0.0f, 0.0f };
+
 	float x = ball.m_Pos.x + ball.m_Momen.x * deltaTime;
 	float y = ball.m_Pos.y + ball.m_Momen.y * deltaTime;
-	ball.SetPosition(x, y);
+	ball.m_Momen *= 0.9998f; // Friction
 
-	m_MVP = m_Proj * m_View * ball.GetModelMatrix();
+	ball.SetPosition(x, y);
+}
+
+void Pool::SetMVP(GameObject& object)
+{
+	m_MVP = m_Proj * m_View * object.GetModelMatrix();
 	m_Shader.SetUniformMatrix4fv("u_MVP", 1, GL_FALSE, &m_MVP[0][0]);
 }
 
@@ -112,17 +125,24 @@ void Pool::DrawPool()
 	lastFrame = time;
 
 	int state = glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT);
-	if (state == GLFW_PRESS)
-		balls[15].m_Momen.x = 1000.0f;
-		
-	for (int i = 0; i < balls.size(); i++) 
-	{
-		for (int j = i + 1; j < balls.size(); j++)
-			BallCollision(balls[i], balls[j]);
-
-		WallCollision(balls[i]);
-		UpdatePosition(balls[i], deltaTime);
-		balls[i].Draw();
+	if (state == GLFW_PRESS) {
+		m_Balls[15].m_Momen.x = 1000.0f;
 	}
+		
+	for (int i = 0; i < m_Balls.size(); i++) 
+	{
+		for (int j = i + 1; j < m_Balls.size(); j++)
+			BallCollision(m_Balls[i], m_Balls[j]);
+
+		WallCollision(m_Balls[i]);
+		UpdatePosition(m_Balls[i], deltaTime);
+
+		SetMVP(m_Balls[i]);
+		m_Balls[i].Draw();
+	}
+
+	SetMVP(m_Stick);
+	m_Stick.Draw();
+
 	m_Shader.Unbind();
 }
