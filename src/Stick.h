@@ -4,12 +4,13 @@
 
 class Stick : public GameObject {
 public:
-	Stick() : GameObject(), m_Pos(0) {}
+	Stick() : GameObject() {}
 
-	void SetPosition(float x, float y);
-	void RotateStick(float x, float y);
-	void HitBall();
+	void SetStartPosition(float x, float y); // to be used everytime the cue ball is repositioned
+	void RotateStick(float x, float y, glm::vec2 pivotPoint);
+	void HitBall(); // TODO - implement this method
 
-private:
-	glm::vec2 m_Pos;
+public:
+	glm::vec2 m_Pos      = { 0.0f, 0.0f };
+	glm::vec2 m_StartPos = { 0.0f, 0.0f };
 };
