@@ -4,7 +4,6 @@
 #include "Stick.h"
 #include "Shader.h"
 #include "glm/glm.hpp"
-#include <array>
 
 struct GLFWwindow;
 
@@ -15,10 +14,14 @@ public:
 
 	void SetProjection();
 	void InitGame();
+
 	void WallCollision(Ball& ball);
 	void BallCollision(Ball& ballA, Ball& ballB);
-	void UpdatePosition(Ball& ball, float deltaTime);
-	void SetMVP(GameObject& object);
+	void UpdateBallPosition(Ball& ball, float deltaTime);
+	void UpdateStickPosition();
+
+	glm::vec2 GetMousePosition();
+	void SetMVP(GameObject& object); // for switching back and forth between MVP's
 	void DrawPool();
 
 private:
