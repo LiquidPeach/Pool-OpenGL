@@ -44,7 +44,7 @@ void Ball::SetPosition(float x, float y)
 	m_Pos.x = x;
 	m_Pos.y = y;
 
-	SetModelMatrix(glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0)));
+	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0));
 }
 
 void Ball::SetMomentum(float x, float y)
