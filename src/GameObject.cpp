@@ -1,5 +1,7 @@
 #include "GameObject.h"
 
+#include <iostream>
+
 void GameObject::CreateGameObject(const std::string& texSource, float width, float height)
 {
 	m_Width = width;

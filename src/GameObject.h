@@ -7,6 +7,7 @@
 #include "Texture.h"
 
 #include <string>
+#include <array>
 
 class GameObject {
 public:
