@@ -16,12 +16,10 @@ void Stick::SetStartPosition(float x, float y)
 	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0));
 }
 
-void Stick::RotateStick(float x, float y, glm::vec2 pivotPoint)
+void Stick::RotateStick(float angle, glm::vec2 pivotPoint)
 {
-	float theta = atan2f(y, x);
-
-	float cosine = cos(theta);
-	float sine = sin(theta);
+	float cosine = cos(angle);
+	float sine = sin(angle);
 	float cx = pivotPoint.x;
 	float cy = pivotPoint.y;
 	
@@ -31,5 +29,10 @@ void Stick::RotateStick(float x, float y, glm::vec2 pivotPoint)
 
 	// update the model matrix
 	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(m_Pos.x, m_Pos.y, 0));
-	m_Model *= glm::rotate(glm::mat4(1.0f), theta, glm::vec3(0.0f, 0.0f, 1.0f));
+	m_Model *= glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
+}
+
+void Stick::PullStick(float angle)
+{
+	// Increase or Decrease magnitude
 }

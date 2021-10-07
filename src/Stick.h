@@ -7,8 +7,8 @@ public:
 	Stick() : GameObject() {}
 
 	void SetStartPosition(float x, float y); // to be used everytime the cue ball is repositioned
-	void RotateStick(float x, float y, glm::vec2 pivotPoint);
-	void HitBall(); // TODO - implement this method
+	void RotateStick(float angle, glm::vec2 pivotPoint);
+	void PullStick(float angle);
 
 public:
 	glm::vec2 m_Pos      = { 0.0f, 0.0f };
