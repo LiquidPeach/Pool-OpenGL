@@ -8,8 +8,11 @@
 static float s_DeltaTime = 0.0f;
 static float s_LastFrame = 0.0f;
 
-static int s_White = 0;
+// Index of the cue and black ball in the array of Balls
+static int s_Cue = 0;
 static int s_Black = 0;
+
+static bool s_Moving = false; // To check if every ball is moving
 
 Pool::Pool(GLFWwindow* window, float windowWidth, float windowHeight)
 	: m_Model(0), m_View(0), m_Proj(0), m_MVP(0)
@@ -72,18 +75,18 @@ void Pool::InitGame() // Ball and stick setup
 
 	// White ball
 	m_Balls[15].CreateBall("res/whiteBall.png", radius, 180.0f, yPos, BallColor::WHITE);
-	s_White = 15;
+	s_Cue = 15;
 
 	// Stick
-	m_Stick.CreateGameObject("res/stick.png", 650.0f, 25.0f);
+	m_Stick.CreateGameObject("res/stick.png", 625.0f, 25.0f);
 }
 
 void Pool::WallCollision(Ball& ball)
 {
 	if (ball.m_Pos.x >= (m_WindowWidth - ball.m_Radius) || ball.m_Pos.x <= ball.m_Radius)
-		ball.m_Momen.x *= -1;
+		ball.m_Vel.x *= -1;
 	if (ball.m_Pos.y >= (m_WindowHeight - ball.m_Radius) || ball.m_Pos.y <= ball.m_Radius)
-		ball.m_Momen.y *= -1;
+		ball.m_Vel.y *= -1;
 }
 
 void Pool::BallCollision(Ball& ballA, Ball& ballB) // Subtract the distance between two balls with their summed radii
@@ -102,50 +105,53 @@ void Pool::BallCollision(Ball& ballA, Ball& ballB) // Subtract the distance betw
 		forceA = k * (magDist - R) * glm::normalize(dist);
 		forceB = -1.0f * forceA;
 	}
-	ballA.m_Momen += forceA;
-	ballB.m_Momen += forceB;
+	ballA.m_Vel += forceA;
+	ballB.m_Vel += forceB;
 }
 
 void Pool::UpdateBallPosition(Ball& ball, float deltaTime)
 {
-	float magMomen = sqrt( (ball.m_Momen.x * ball.m_Momen.x) + (ball.m_Momen.y * ball.m_Momen.y) );
-	if (magMomen < 2.6f)
-		ball.m_Momen = { 0.0f, 0.0f };
+	double magVel = sqrt( pow(ball.m_Vel.x, 2) + pow(ball.m_Vel.y, 2) );
+	if (magVel <= 2.5)
+		ball.m_Vel = { 0.0f, 0.0f };
+
+	ball.m_Vel *= 0.9995f;
+	ball.m_Momen = ball.m_Mass * ball.m_Vel; // Friction
 
 	float x = ball.m_Pos.x + ball.m_Momen.x * deltaTime;
 	float y = ball.m_Pos.y + ball.m_Momen.y * deltaTime;
-	ball.m_Momen *= 0.9998f; // Friction
-
 	ball.SetPosition(x, y);
 }
 
 void Pool::UpdateStickPosition()
 {
-	glm::vec2 mousePos = GetMousePosition();
-
-	float xDiff = mousePos.x - m_Balls[s_White].m_Pos.x;
-	float yDiff = mousePos.y - m_Balls[s_White].m_Pos.y;
-
-	float x = m_Stick.m_Pos.x - m_Balls[s_White].m_Pos.x;
-	float y = m_Stick.m_Pos.y - m_Balls[s_White].m_Pos.y;
-	glm::vec2 h(x, y);
-
-	m_Stick.RotateStick(xDiff, yDiff, m_Balls[s_White].m_Pos);
+	float angle = GetMouseAngle();
+	m_Stick.RotateStick(angle, m_Balls[s_Cue].m_Pos);
 }
 
-glm::vec2 Pool::GetMousePosition()
+float Pool::GetMouseAngle()
 {
-	double xPos, yPos;
-	glfwGetCursorPos(m_Window, &xPos, &yPos); // returns coordinates relative to top left corner of window
+	double xMouse, yMouse;
+	glfwGetCursorPos(m_Window, &xMouse, &yMouse); // Returns coordinates relative to top left corner of window...
+	// ...so we must make it relative to the bottom left corner, since this is the origin according to the projection matrix
+	yMouse = m_WindowHeight - yMouse;
+	
+	// Find the distance from the mouse to the cue ball
+	float xDiff = (float)xMouse - m_Balls[s_Cue].m_Pos.x;
+	float yDiff = (float)yMouse - m_Balls[s_Cue].m_Pos.y;
 
-	// since projection matrix is relative to bottom left corner of screen
-	yPos = m_WindowHeight - yPos;
+	return atan2f(yDiff, xDiff); // return angle in radians
+}
 
-	glm::vec2 mousePos(0);
-	mousePos.x = float(xPos);
-	mousePos.y = float(yPos);
+void Pool::HitCueBall()
+{
+	float force = 1000.0f; // TODO - let the user control the force of the hit
+	float angle = GetMouseAngle();
 
-	return mousePos;
+	float x = force * cos(angle);
+	float y = force * sin(angle);
+
+	m_Balls[s_Cue].m_Vel = { x, y };
 }
 
 void Pool::SetMVP(GameObject& object)
@@ -163,11 +169,12 @@ void Pool::DrawPool()
 	s_LastFrame = time;
 
 	int state = glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT);
-	if (state == GLFW_PRESS) {
-		m_Balls[s_White].m_Momen.x = 1000.0f;
-		m_Balls[s_White].m_Momen.y = 100.0f;
+	if (state == GLFW_PRESS && s_Moving == false) {
+		HitCueBall();
+		s_Moving = true;
 	}
-		
+
+	int ballCount = 0;
 	for (int i = 0; i < m_Balls.size(); i++) 
 	{
 		for (int j = i + 1; j < m_Balls.size(); j++)
@@ -176,14 +183,27 @@ void Pool::DrawPool()
 		WallCollision(m_Balls[i]);
 		UpdateBallPosition(m_Balls[i], s_DeltaTime);
 
+		if (m_Balls[i].m_Vel.x == 0 && m_Balls[i].m_Vel.y == 0) {
+			s_Moving = false;
+			ballCount++;
+		} else {
+			s_Moving = true;
+			ballCount = 0;
+		}
+		if (s_Moving == false && ballCount == m_Balls.size())
+			s_Moving = false;
+		else
+			s_Moving = true;
+
 		SetMVP(m_Balls[i]);
 		m_Balls[i].Draw();
 	}
-	// TODO - check if all balls are stopped before drawing the stick
-	if (m_Balls[s_White].m_Momen.x == 0 && m_Balls[s_White].m_Momen.y == 0) 
+
+	if (s_Moving == false)  // If all balls are stopped
 	{
-		float x = m_Balls[s_White].m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[s_White].m_Radius;
-		m_Stick.SetStartPosition(x, m_Balls[s_White].m_Pos.y);
+		// Set position of the cue stick and draw it
+		float x = m_Balls[s_Cue].m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[s_Cue].m_Radius;
+		m_Stick.SetStartPosition(x, m_Balls[s_Cue].m_Pos.y);
 
 		UpdateStickPosition();
 		SetMVP(m_Stick);
