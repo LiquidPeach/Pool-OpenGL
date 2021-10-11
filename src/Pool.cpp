@@ -115,8 +115,8 @@ void Pool::UpdateBallPosition(Ball& ball, float deltaTime)
 	if (magVel <= 2.5)
 		ball.m_Vel = { 0.0f, 0.0f };
 
-	ball.m_Vel *= 0.9995f;
-	ball.m_Momen = ball.m_Mass * ball.m_Vel; // Friction
+	ball.m_Vel *= 0.9995f; // Friction
+	ball.m_Momen = ball.m_Mass * ball.m_Vel;
 
 	float x = ball.m_Pos.x + ball.m_Momen.x * deltaTime;
 	float y = ball.m_Pos.y + ball.m_Momen.y * deltaTime;
@@ -126,7 +126,7 @@ void Pool::UpdateBallPosition(Ball& ball, float deltaTime)
 void Pool::UpdateStickPosition()
 {
 	float angle = GetMouseAngle();
-	m_Stick.RotateStick(angle, m_Balls[s_Cue].m_Pos);
+	m_Stick.RotateStick(angle, m_Balls[s_Cue].m_Pos, m_MousePos);
 }
 
 float Pool::GetMouseAngle()
@@ -135,6 +135,8 @@ float Pool::GetMouseAngle()
 	glfwGetCursorPos(m_Window, &xMouse, &yMouse); // Returns coordinates relative to top left corner of window...
 	// ...so we must make it relative to the bottom left corner, since this is the origin according to the projection matrix
 	yMouse = m_WindowHeight - yMouse;
+
+	m_MousePos = { (float)xMouse, (float)yMouse };
 	
 	// Find the distance from the mouse to the cue ball
 	float xDiff = (float)xMouse - m_Balls[s_Cue].m_Pos.x;
@@ -145,11 +147,10 @@ float Pool::GetMouseAngle()
 
 void Pool::HitCueBall()
 {
-	float force = 1000.0f; // TODO - let the user control the force of the hit
-	float angle = GetMouseAngle();
+	float angle = m_Stick.m_Angle;
 
-	float x = force * cos(angle);
-	float y = force * sin(angle);
+	float x = m_Stick.m_Force * cos(angle) * 100.0f;
+	float y = m_Stick.m_Force * sin(angle) * 100.0f;
 
 	m_Balls[s_Cue].m_Vel = { x, y };
 }
@@ -168,11 +169,7 @@ void Pool::DrawPool()
 	s_DeltaTime = time - s_LastFrame;
 	s_LastFrame = time;
 
-	int state = glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT);
-	if (state == GLFW_PRESS && s_Moving == false) {
-		HitCueBall();
-		s_Moving = true;
-	}
+	// Render Balls
 
 	int ballCount = 0;
 	for (int i = 0; i < m_Balls.size(); i++) 
@@ -183,10 +180,13 @@ void Pool::DrawPool()
 		WallCollision(m_Balls[i]);
 		UpdateBallPosition(m_Balls[i], s_DeltaTime);
 
-		if (m_Balls[i].m_Vel.x == 0 && m_Balls[i].m_Vel.y == 0) {
+		if (m_Balls[i].m_Vel.x == 0 && m_Balls[i].m_Vel.y == 0) 
+		{
 			s_Moving = false;
 			ballCount++;
-		} else {
+		} 
+		else 
+		{
 			s_Moving = true;
 			ballCount = 0;
 		}
@@ -199,8 +199,23 @@ void Pool::DrawPool()
 		m_Balls[i].Draw();
 	}
 
-	if (s_Moving == false)  // If all balls are stopped
+	// Render Cue Stick
+
+	// TODO - drag stick with mouse instead of Down key
+	//int state = glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT);
+	int downState = glfwGetKey(m_Window, GLFW_KEY_DOWN);
+	if (downState == GLFW_PRESS && s_Moving == false)
 	{
+		m_Stick.PullStick();
+
+		SetMVP(m_Stick);
+		m_Stick.Draw();
+	}
+	else if (downState == GLFW_RELEASE && s_Moving == false)
+	{
+		HitCueBall();
+		m_Stick.m_Force = 0.0f; // Reset force back to 0 after each hit
+
 		// Set position of the cue stick and draw it
 		float x = m_Balls[s_Cue].m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[s_Cue].m_Radius;
 		m_Stick.SetStartPosition(x, m_Balls[s_Cue].m_Pos.y);

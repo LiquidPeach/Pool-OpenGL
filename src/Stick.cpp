@@ -16,12 +16,16 @@ void Stick::SetStartPosition(float x, float y)
 	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0));
 }
 
-void Stick::RotateStick(float angle, glm::vec2 pivotPoint)
+void Stick::RotateStick(float angle, glm::vec2 pivotPoint, glm::vec2 mouse)
 {
-	float cosine = cos(angle);
-	float sine = sin(angle);
-	float cx = pivotPoint.x;
-	float cy = pivotPoint.y;
+	m_Angle = angle;
+	m_Mouse = mouse;
+	m_Pivot = pivotPoint;
+
+	float cosine = cos(m_Angle);
+	float sine = sin(m_Angle);
+	float cx = m_Pivot.x;
+	float cy = m_Pivot.y;
 	
 	// rotate stick according to the desired distance between the ball and the stick
 	m_Pos.x = ((m_StartPos.x - cx) * cosine - (m_StartPos.y - cy) * sine) + cx;
@@ -29,10 +33,26 @@ void Stick::RotateStick(float angle, glm::vec2 pivotPoint)
 
 	// update the model matrix
 	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(m_Pos.x, m_Pos.y, 0));
-	m_Model *= glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
+	m_Model *= glm::rotate(glm::mat4(1.0f), m_Angle, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Stick::PullStick(float angle)
+void Stick::PullStick()
 {
-	// Increase or Decrease magnitude
+	if (m_Force <= 10.0f)
+	{
+		// Change in x and y from stick position and pivot (cue ball position)
+		float deltaX = m_Pos.x - m_Pivot.x;
+		float deltaY = m_Pos.y - m_Pivot.y;
+
+		deltaX *= 1.025f;
+		deltaY *= 1.025f;
+
+		m_Pos.x = m_Pivot.x + deltaX;
+		m_Pos.y = m_Pivot.y + deltaY;
+
+		m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(m_Pos, 0));
+		m_Model *= glm::rotate(glm::mat4(1.0f), m_Angle, glm::vec3(0.0f, 0.0f, 1.0f));
+
+		m_Force++;
+	}
 }
