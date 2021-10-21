@@ -42,6 +42,6 @@ private:
 	Stick  m_Stick;
 	std::array<Ball, 16> m_Balls;
 
-	glm::vec2 m_MousePos = { 0.0f, 0.0f };
+	glm::vec2 m_MousePos = { 0, 0 };
 	glm::mat4 m_View, m_Proj;
 };

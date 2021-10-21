@@ -139,8 +139,8 @@ void Pool::HitCueBall()
 {
 	float angle = m_Stick.m_Angle;
 
-	float x = m_Stick.m_Force * cos(angle) * 100.0f;
-	float y = m_Stick.m_Force * sin(angle) * 100.0f;
+	float x = m_Stick.m_Force * cos(angle);
+	float y = m_Stick.m_Force * sin(angle);
 
 	m_Balls[m_Cue].m_Vel = { x, y };
 }
@@ -191,9 +191,8 @@ void Pool::DrawPool()
 
 	// Render Cue Stick
 
-	// TODO - drag stick with mouse instead of Down key
 	int state = glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT);
-	//int downState = glfwGetKey(m_Window, GLFW_KEY_DOWN);
+
 	if (state == GLFW_PRESS && m_Moving == false)
 	{
 		double xMouse, yMouse;
@@ -216,6 +215,9 @@ void Pool::DrawPool()
 		// Set position of the cue stick and draw it
 		float x = m_Balls[m_Cue].m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[m_Cue].m_Radius;
 		m_Stick.SetStartPosition(x, m_Balls[m_Cue].m_Pos.y);
+
+		glm::vec2 ballDist = m_Stick.m_Pos - m_Balls[m_Cue].m_Pos;
+		m_Stick.m_BallDist = sqrtf(powf(ballDist.x, 2) + powf(ballDist.y, 2));
 
 		UpdateStickPosition();
 		SetMVP(m_Stick);

@@ -23,7 +23,7 @@ public:
 	float m_Mass = 1.0f; // kgs
 	float m_Radius = 0;
 	BallColor m_Color;
-	glm::vec2 m_Pos   = { 0.0f, 0.0f };
-	glm::vec2 m_Vel   = { 0.0f, 0.0f };
-	glm::vec2 m_Momen = { 0.0f, 0.0f };
+	glm::vec2 m_Pos   = { 0, 0 };
+	glm::vec2 m_Vel   = { 0, 0 };
+	glm::vec2 m_Momen = { 0, 0 };
 };
