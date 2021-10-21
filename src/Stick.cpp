@@ -36,23 +36,24 @@ void Stick::RotateStick(float angle, glm::vec2 pivotPoint, glm::vec2 mouse)
 	m_Model *= glm::rotate(glm::mat4(1.0f), m_Angle, glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
-void Stick::PullStick()
+void Stick::PullStick(glm::vec2 mouse)
 {
-	if (m_Force <= 10.0f)
-	{
-		// Change in x and y from stick position and pivot (cue ball position)
-		float deltaX = m_Pos.x - m_Pivot.x;
-		float deltaY = m_Pos.y - m_Pivot.y;
+	// OPTIMAIZATION - Find point closest to the slope
+	// y = mx + b
 
-		deltaX *= 1.025f;
-		deltaY *= 1.025f;
+	glm::vec2 mVec = m_Mouse - m_Pivot;
+	float m1 = mVec.y / mVec.x;
+	float m2 = -mVec.x / mVec.y;
 
-		m_Pos.x = m_Pivot.x + deltaX;
-		m_Pos.y = m_Pivot.y + deltaY;
+	float b1 = m_Mouse.y - (m1 * m_Mouse.x);
+	float b2 = mouse.y - (m2 * mouse.x);
 
-		m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(m_Pos, 0));
-		m_Model *= glm::rotate(glm::mat4(1.0f), m_Angle, glm::vec3(0.0f, 0.0f, 1.0f));
+	float newX = (b2 - b1) / (m1 - m2);
+	float newY = (m1 * newX) + b1;
 
-		m_Force++;
-	}
+	// TODO - make cue stick move up/down along with mouse
+	/*
+	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(m_Pos, 0));
+	m_Model *= glm::rotate(glm::mat4(1.0f), m_Angle, glm::vec3(0.0f, 0.0f, 1.0f));
+	*/
 }

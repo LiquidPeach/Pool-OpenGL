@@ -8,7 +8,7 @@ public:
 
 	void SetStartPosition(float x, float y); // To be used everytime the cue ball is repositioned
 	void RotateStick(float angle, glm::vec2 pivotPoint, glm::vec2 mouse);
-	void PullStick();
+	void PullStick(glm::vec2 mouse);
 
 public:
 	float m_Angle = 0.0f;
