@@ -53,9 +53,3 @@ void Ball::ResetPosition()
 	m_Pos = m_StartPos;
 	m_Vel = m_Momen = { 0, 0 };
 }
-
-void Ball::SetMomentum(float x, float y)
-{
-	m_Momen.x = x;
-	m_Momen.y = y;
-}

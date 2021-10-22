@@ -19,7 +19,6 @@ public:
 	void SetPosition(float x, float y);
 	void ResetPosition();
 	glm::vec2 GetPosition() const { return m_Pos; }
-	void SetMomentum(float x, float y);
 
 public:
 	float m_Mass = 1.0f; // kgs
