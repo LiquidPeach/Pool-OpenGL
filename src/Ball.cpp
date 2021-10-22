@@ -9,6 +9,7 @@ void Ball::CreateBall(const std::string& texSource, float radius, float xPos, fl
 	m_Height = radius * 2;
 
 	SetPosition(xPos, yPos);
+	m_StartPos = m_Pos;
 
 	float vertices[] = {
 		// Positions				   // Texture
@@ -45,6 +46,12 @@ void Ball::SetPosition(float x, float y)
 	m_Pos.y = y;
 
 	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0));
+}
+
+void Ball::ResetPosition()
+{
+	m_Pos = m_StartPos;
+	m_Vel = m_Momen = { 0, 0 };
 }
 
 void Ball::SetMomentum(float x, float y)

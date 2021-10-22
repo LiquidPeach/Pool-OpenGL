@@ -71,6 +71,17 @@ void Pool::InitGame() // Ball and stick setup
 	m_Stick.CreateGameObject("res/stick.png", 625.0f, 25.0f);
 }
 
+void Pool::ResetGame()
+{
+	for (int i = 0; i < m_Balls.size(); i++)
+	{
+		m_Balls[i].ResetPosition();
+	}
+
+	float x = m_Balls[m_Cue].m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[m_Cue].m_Radius;
+	m_Stick.SetStartPosition(x, m_Balls[m_Cue].m_Pos.y);
+}
+
 void Pool::WallCollision(Ball& ball)
 {
 	if (ball.m_Pos.x >= (m_WindowWidth - ball.m_Radius) || ball.m_Pos.x <= ball.m_Radius)

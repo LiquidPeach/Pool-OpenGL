@@ -14,6 +14,7 @@ public:
 
 	void SetProjection();
 	void InitGame();
+	void ResetGame();
 
 	void WallCollision(Ball& ball);
 	void BallCollision(Ball& ballA, Ball& ballB);
