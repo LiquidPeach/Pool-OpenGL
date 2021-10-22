@@ -1,5 +1,7 @@
 #include "VertexBuffer.h"
 
+#include <iostream>
+
 VertexBuffer::~VertexBuffer() 
 {
 	glDeleteBuffers(GL_ARRAY_BUFFER, &m_BufferID);

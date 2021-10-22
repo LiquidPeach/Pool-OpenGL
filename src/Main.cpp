@@ -29,6 +29,11 @@ int main(void)
         glClearColor(0.0f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        int resetButton = glfwGetKey(window, GLFW_KEY_R);
+
+        if (resetButton == GLFW_PRESS)
+            pool.ResetGame();
+
         pool.DrawPool();
 
         glfwSwapBuffers(window);

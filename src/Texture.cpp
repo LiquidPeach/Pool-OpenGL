@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <stb/stb_image.h>
 
+#include <iostream>
+
 Texture::~Texture() 
 {
 	glDeleteTextures(1, &m_RenderID);
