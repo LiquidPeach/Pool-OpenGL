@@ -7,7 +7,7 @@ public:
 	Texture() = default;
 	~Texture();
 
-	void CreateTexture(const std::string& path);
+	void CreateTexture(const char* path);
 	int GetWidth() const { return m_Width; }
 	int GetHeight() const { return m_Height; }
 
@@ -20,6 +20,5 @@ private:
 	int m_Width = 0;
 	int m_Height = 0;
 	int m_BPP = 0; // Bits Per Pixel
-	std::string m_FilePath = "";
 	unsigned char* m_LocalBuffer = 0;
 };

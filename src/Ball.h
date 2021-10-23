@@ -15,7 +15,7 @@ public:
 	Ball() : GameObject(), m_Color(BallColor::RED) {}
 	~Ball() = default;
 
-	void CreateBall(const std::string& texSource, float radius, float xPos, float yPos, BallColor color);
+	void CreateBall(Texture* tex, float radius, float xPos, float yPos, BallColor color);
 	void SetPosition(float x, float y);
 	void ResetPosition();
 	glm::vec2 GetPosition() const { return m_Pos; }

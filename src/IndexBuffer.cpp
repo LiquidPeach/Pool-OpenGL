@@ -1,7 +1,5 @@
 #include "IndexBuffer.h"
 
-#include <iostream>
-
 IndexBuffer::~IndexBuffer()
 {
 	glDeleteBuffers(GL_ELEMENT_ARRAY_BUFFER, &m_BufferID);

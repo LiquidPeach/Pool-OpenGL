@@ -12,6 +12,12 @@ Pool::Pool(GLFWwindow* window, float windowWidth, float windowHeight)
 
 	m_Shader.CreateProgram("src/shaders/defaultVert.vert", "src/shaders/defaultFrag.frag");
 
+	m_RedTex.CreateTexture("res/redBall.png");
+	m_BlueTex.CreateTexture("res/blueBall.png");
+	m_BlackTex.CreateTexture("res/blackBall.png");
+	m_WhiteTex.CreateTexture("res/whiteBall.png");
+	m_CueTex.CreateTexture("res/stick.png");
+
 	SetProjection();
 	InitGame();
 }
@@ -38,37 +44,37 @@ void Pool::InitGame() // Ball and stick setup
 	float radius = size / 2.0f;
 
 	// Row 1
-	m_Balls[0].CreateBall("res/redBall.png", radius, xPos, yPos, BallColor::RED);
+	m_Balls[0].CreateBall(&m_RedTex, radius, xPos, yPos, BallColor::RED);
 
 	// Row 2
-	m_Balls[1].CreateBall("res/blueBall.png", radius, xPos + size, yPos - radius, BallColor::BLUE);
-	m_Balls[2].CreateBall("res/redBall.png", radius, xPos + size, yPos + radius, BallColor::RED);
+	m_Balls[1].CreateBall(&m_BlueTex, radius, xPos + size, yPos - radius, BallColor::BLUE);
+	m_Balls[2].CreateBall(&m_RedTex, radius, xPos + size, yPos + radius, BallColor::RED);
 
 	// Row 3 with Black Ball
-	m_Balls[3].CreateBall("res/blueBall.png", radius, xPos + (size * 2), yPos - (radius * 2), BallColor::BLUE);
-	m_Balls[4].CreateBall("res/blackBall.png", radius, xPos + (size * 2), yPos, BallColor::BLACK);
+	m_Balls[3].CreateBall(&m_BlueTex, radius, xPos + (size * 2), yPos - (radius * 2), BallColor::BLUE);
+	m_Balls[4].CreateBall(&m_BlackTex, radius, xPos + (size * 2), yPos, BallColor::BLACK);
 	m_Black = 4;
-	m_Balls[5].CreateBall("res/redBall.png", radius, xPos + (size * 2), yPos + (radius * 2), BallColor::RED);
+	m_Balls[5].CreateBall(&m_RedTex, radius, xPos + (size * 2), yPos + (radius * 2), BallColor::RED);
 
 	// Row 4
-	m_Balls[6].CreateBall("res/blueBall.png", radius, xPos + (size * 3), yPos - (radius * 3), BallColor::BLUE);
-	m_Balls[7].CreateBall("res/redBall.png", radius, xPos + (size * 3), yPos - radius, BallColor::RED);
-	m_Balls[8].CreateBall("res/blueBall.png", radius, xPos + (size * 3), yPos + radius, BallColor::BLUE);
-	m_Balls[9].CreateBall("res/redBall.png", radius, xPos + (size * 3), yPos + (radius * 3), BallColor::RED);
+	m_Balls[6].CreateBall(&m_BlueTex, radius, xPos + (size * 3), yPos - (radius * 3), BallColor::BLUE);
+	m_Balls[7].CreateBall(&m_RedTex, radius, xPos + (size * 3), yPos - radius, BallColor::RED);
+	m_Balls[8].CreateBall(&m_BlueTex, radius, xPos + (size * 3), yPos + radius, BallColor::BLUE);
+	m_Balls[9].CreateBall(&m_RedTex, radius, xPos + (size * 3), yPos + (radius * 3), BallColor::RED);
 
 	// Row 5
-	m_Balls[10].CreateBall("res/redBall.png", radius, xPos + (size * 4), yPos - (radius * 4), BallColor::RED);
-	m_Balls[11].CreateBall("res/blueBall.png", radius, xPos + (size * 4), yPos - (radius * 2), BallColor::BLUE);
-	m_Balls[12].CreateBall("res/blueBall.png", radius, xPos + (size * 4), yPos, BallColor::BLUE);
-	m_Balls[13].CreateBall("res/redBall.png", radius, xPos + (size * 4), yPos + (radius * 2), BallColor::RED);
-	m_Balls[14].CreateBall("res/blueBall.png", radius, xPos + (size * 4), yPos + (radius * 4), BallColor::BLUE);
+	m_Balls[10].CreateBall(&m_RedTex, radius, xPos + (size * 4), yPos - (radius * 4), BallColor::RED);
+	m_Balls[11].CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos - (radius * 2), BallColor::BLUE);
+	m_Balls[12].CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos, BallColor::BLUE);
+	m_Balls[13].CreateBall(&m_RedTex, radius, xPos + (size * 4), yPos + (radius * 2), BallColor::RED);
+	m_Balls[14].CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos + (radius * 4), BallColor::BLUE);
 
 	// Cue ball
-	m_Balls[15].CreateBall("res/whiteBall.png", radius, 180.0f, yPos, BallColor::WHITE);
+	m_Balls[15].CreateBall(&m_WhiteTex, radius, 180.0f, yPos, BallColor::WHITE);
 	m_Cue = 15;
 
 	// Cue Stick
-	m_Stick.CreateGameObject("res/stick.png", 625.0f, 25.0f);
+	m_Stick.CreateGameObject(&m_CueTex, 625.0f, 25.0f);
 }
 
 void Pool::ResetGame()

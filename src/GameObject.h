@@ -7,18 +7,17 @@
 #include "Texture.h"
 
 #include <string>
-#include <array>
 
 class GameObject {
 public:
 	GameObject() : m_Model(0) {};
 	~GameObject() = default;
 
-	void CreateGameObject(const std::string& texSource, float width, float height);
+	void CreateGameObject(Texture* tex, float width, float height);
 
 	float GetWidth() const { return m_Width; }
 	float GetHeight() const { return m_Height; }
-	void SetModelMatrix(glm::mat4 model);
+	void SetModelMatrix(const glm::mat4& model);
 	glm::mat4 GetModelMatrix() const { return m_Model; }
 	void Draw() const;
 
@@ -26,7 +25,7 @@ protected:
 	VertexArray  m_VAO;
 	VertexBuffer m_VBO;
 	IndexBuffer  m_EBO;
-	Texture      m_Texture;
+	Texture* m_Texture = nullptr;
 
 	float m_Width = 0;
 	float m_Height = 0;

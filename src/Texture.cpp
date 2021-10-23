@@ -3,19 +3,15 @@
 #include <glad/glad.h>
 #include <stb/stb_image.h>
 
-#include <iostream>
-
 Texture::~Texture() 
 {
 	glDeleteTextures(1, &m_RenderID);
 }
 
-void Texture::CreateTexture(const std::string& path) 
+void Texture::CreateTexture(const char* path) 
 {
-	m_FilePath = path;
-
 	stbi_set_flip_vertically_on_load(1);
-	m_LocalBuffer = stbi_load(m_FilePath.c_str(), &m_Width, &m_Height, &m_BPP, 4);
+	m_LocalBuffer = stbi_load(path, &m_Width, &m_Height, &m_BPP, 4);
 
 	glGenTextures(1, &m_RenderID);
 	glBindTexture(GL_TEXTURE_2D, m_RenderID);

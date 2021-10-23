@@ -3,7 +3,10 @@
 #include "Ball.h"
 #include "Stick.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "glm/glm.hpp"
+
+#include <array>
 
 struct GLFWwindow;
 
@@ -23,7 +26,7 @@ public:
 	float GetMouseAngle();
 
 	void HitCueBall();
-	void SetMVP(GameObject& object); // for switching back and forth between MVP's
+	void SetMVP(GameObject& object);
 	void DrawPool();
 
 private:
@@ -31,16 +34,22 @@ private:
 	float m_WindowWidth  = 0;
 	float m_WindowHeight = 0;
 
-	// Index of the cue and black ball in the array of Balls
-	int m_Cue = 0;
-	int m_Black = 0;
-
 	float m_DeltaTime = 0;
 	float m_LastFrame = 0;
 	bool  m_Moving = false;
 
+	// Index of the cue and black ball in the array of Balls
+	int m_Cue = 0;
+	int m_Black = 0;
+
+	Texture m_BlueTex;
+	Texture m_RedTex;
+	Texture m_BlackTex;
+	Texture m_WhiteTex;
+	Texture m_CueTex;
+
 	Shader m_Shader;
-	Stick  m_Stick;
+	Stick m_Stick;
 	std::array<Ball, 16> m_Balls;
 
 	glm::vec2 m_MousePos = { 0, 0 };

@@ -1,12 +1,13 @@
 #include "Ball.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-void Ball::CreateBall(const std::string& texSource, float radius, float xPos, float yPos, BallColor color)
+void Ball::CreateBall(Texture* tex, float radius, float xPos, float yPos, BallColor color)
 {
 	m_Color = color;
 	m_Radius = radius;
 	m_Width = radius * 2;
 	m_Height = radius * 2;
+	m_Texture = tex;
 
 	SetPosition(xPos, yPos);
 	m_StartPos = m_Pos;
@@ -24,11 +25,11 @@ void Ball::CreateBall(const std::string& texSource, float radius, float xPos, fl
 	};
 
 	m_VAO.Bind();
-	m_VBO.CreateBuffer(vertices, sizeof(vertices));
-	m_EBO.CreateBuffer(indices, sizeof(indices));
+	m_VBO.CreateBuffer(vertices, 16 * sizeof(float));
+	m_EBO.CreateBuffer(indices, 6 * sizeof(float));
 
-	m_Texture.CreateTexture(texSource);
-	m_Texture.Bind();
+	//m_Texture.CreateTexture(texSource);
+	//m_Texture->Bind();
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
@@ -36,7 +37,7 @@ void Ball::CreateBall(const std::string& texSource, float radius, float xPos, fl
 	m_VAO.LinkAttributes(m_VBO, 0, 2, GL_FLOAT, 4 * sizeof(float), (const void*)0);
 	m_VAO.LinkAttributes(m_VBO, 1, 2, GL_FLOAT, 4 * sizeof(float), (const void*)(2 * sizeof(float)));
 
-	m_Texture.Unbind();
+	//m_Texture->Unbind();
 	m_VAO.Unbind();
 }
 
