@@ -18,7 +18,7 @@ public:
 
 	glm::vec2 m_Pos      = { 0, 0 };
 	glm::vec2 m_StartPos = { 0, 0 };
-	glm::vec2 m_TempPos	 = { 0, 0 };
+	glm::vec2 m_TempPos  = { 0, 0 };
 
 	glm::vec2 m_ClickPos   = { 0, 0 };
 	glm::vec2 m_MouseToPos = { 0, 0 };

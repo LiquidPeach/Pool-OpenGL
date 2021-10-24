@@ -118,9 +118,9 @@ void Pool::BallCollision(Ball& ballA, Ball& ballB) // Subtract the distance betw
 
 void Pool::UpdateBallPosition(Ball& ball, float deltaTime)
 {
-	float magVel = sqrtf( powf(ball.m_Vel.x, 2) + powf(ball.m_Vel.y, 2) );
+	float magVel = sqrtf(powf(ball.m_Vel.x, 2) + powf(ball.m_Vel.y, 2));
 	if (magVel <= 2.5)
-		ball.m_Vel = { 0.0f, 0.0f };
+		ball.m_Vel = { 0, 0 };
 
 	ball.m_Vel *= 0.9995f; // Friction
 	ball.m_Momen = ball.m_Mass * ball.m_Vel;
@@ -149,7 +149,7 @@ float Pool::GetMouseAngle()
 	float xDiff = (float)xMouse - m_Balls[m_Cue].m_Pos.x;
 	float yDiff = (float)yMouse - m_Balls[m_Cue].m_Pos.y;
 
-	return atan2f(yDiff, xDiff); // return angle in radians
+	return atan2f(yDiff, xDiff);
 }
 
 void Pool::HitCueBall()
@@ -172,7 +172,7 @@ void Pool::DrawPool()
 {
 	m_Shader.Bind();
 
-	float time = static_cast<float>(glfwGetTime());
+	float time = (float)glfwGetTime();
 	m_DeltaTime = time - m_LastFrame;
 	m_LastFrame = time;
 
@@ -197,10 +197,8 @@ void Pool::DrawPool()
 			m_Moving = true;
 			ballCount = 0;
 		}
-		if (m_Moving == false && ballCount == m_Balls.size())
-			m_Moving = false;
-		else
-			m_Moving = true;
+
+		m_Moving = (m_Moving == false && ballCount == m_Balls.size()) ? false : true;
 
 		SetMVP(m_Balls[i]);
 		m_Balls[i].Draw();
@@ -213,8 +211,8 @@ void Pool::DrawPool()
 	if (state == GLFW_PRESS && m_Moving == false)
 	{
 		double xMouse, yMouse;
-		glfwGetCursorPos(m_Window, &xMouse, &yMouse); // Returns coordinates relative to top left corner of window...
-		// ...so we must make it relative to the bottom left corner, since this is the origin according to the projection matrix
+		glfwGetCursorPos(m_Window, &xMouse, &yMouse);
+
 		yMouse = m_WindowHeight - yMouse;
 
 		m_MousePos = { (float)xMouse, (float)yMouse };

@@ -62,16 +62,16 @@ void Stick::PullStick(glm::vec2 mouse)
 	glm::vec2 distFromBall = m_TempPos - m_Pivot; // distance from the potential stick position to the cue ball
 	float ballDist = sqrtf(powf(distFromBall.x, 2) + powf(distFromBall.y, 2));
 
-	float diffBallDist = ballDist - m_BallDist;
+	float ballDistDiff = ballDist - m_BallDist;
 
 	glm::vec2 mouseToClick = { mouseX - m_ClickPos.x, mouseY - m_ClickPos.y };
 	float distFromClick = sqrtf(powf(mouseToClick.x, 2) + powf(mouseToClick.y, 2));
 
 
-	if (diffBallDist >= 0 && distFromClick <= 100.0f)
+	if (ballDistDiff >= 0 && distFromClick <= 100.0f)
 	{
 		m_Pos = m_TempPos;
-		m_Force = diffBallDist * 15.0f;
+		m_Force = ballDistDiff * 15.0f;
 	}
 	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(m_Pos, 0));
 	m_Model *= glm::rotate(glm::mat4(1.0f), m_Angle, glm::vec3(0.0f, 0.0f, 1.0f));
