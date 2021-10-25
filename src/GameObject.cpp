@@ -1,6 +1,12 @@
 #include "GameObject.h"
 
+#include "glm/gtc/matrix_transform.hpp"
 #include <array>
+
+GameObject::GameObject()
+{
+	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+}
 
 void GameObject::CreateGameObject(Texture* tex, float width, float height)
 {
@@ -24,17 +30,21 @@ void GameObject::CreateGameObject(Texture* tex, float width, float height)
 	m_VBO.CreateBuffer(vertices, 16 * sizeof(float));
 	m_EBO.CreateBuffer(indices, 6 * sizeof(float));
 
-	//m_Texture.CreateTexture(texSource);
-	//m_Texture->Bind();
-
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
 	m_VAO.LinkAttributes(m_VBO, 0, 2, GL_FLOAT, 4 * sizeof(float), (const void*)0);
 	m_VAO.LinkAttributes(m_VBO, 1, 2, GL_FLOAT, 4 * sizeof(float), (const void*)(2 * sizeof(float)));
 
-	//m_Texture->Unbind();
 	m_VAO.Unbind();
+}
+
+void GameObject::SetPosition(float x, float y)
+{
+	m_Pos.x = x;
+	m_Pos.y = y;
+
+	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0));
 }
 
 void GameObject::SetModelMatrix(const glm::mat4& model)

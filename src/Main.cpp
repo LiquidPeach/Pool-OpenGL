@@ -10,7 +10,7 @@ int main(void)
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(900, 540, "Pool", NULL, NULL);
+    window = glfwCreateWindow(900, 606, "Pool", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -22,11 +22,10 @@ int main(void)
 
     gladLoadGL();
 
-    Pool pool(window, 900.0f, 540.0f);
+    Pool pool(window, 900, 606);
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.0f, 0.5f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         int resetButton = glfwGetKey(window, GLFW_KEY_R);

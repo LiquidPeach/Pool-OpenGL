@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <math.h>
 
-Pool::Pool(GLFWwindow* window, float windowWidth, float windowHeight)
+Pool::Pool(GLFWwindow* window, unsigned int windowWidth, unsigned int windowHeight)
 	: m_View(0), m_Proj(0)
 {
 	m_Window = window;
@@ -17,9 +17,12 @@ Pool::Pool(GLFWwindow* window, float windowWidth, float windowHeight)
 	m_BlackTex.CreateTexture("res/blackBall.png");
 	m_WhiteTex.CreateTexture("res/whiteBall.png");
 	m_CueTex.CreateTexture("res/stick.png");
+	m_TableTex.CreateTexture("res/table.png");
 
 	SetProjection();
 	InitGame();
+
+	m_Table.SetPosition(m_WindowWidth / 2.0f, m_WindowHeight / 2.0f);
 }
 
 void Pool::SetProjection()
@@ -28,7 +31,7 @@ void Pool::SetProjection()
 
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 	m_View = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-	m_Proj = glm::ortho(0.0f, m_WindowWidth, 0.0f, m_WindowHeight, -1.0f, 1.0f);
+	m_Proj = glm::ortho(0.0f, (float)m_WindowWidth, 0.0f, (float)m_WindowHeight, -1.0f, 1.0f);
 
 	glm::mat4 MVP = m_Proj * m_View * model;
 	m_Shader.SetUniformMatrix4fv("u_MVP", 1, GL_FALSE, &MVP[0][0]);
@@ -38,8 +41,8 @@ void Pool::SetProjection()
 
 void Pool::InitGame() // Ball and stick setup
 {
-	float xPos = m_WindowWidth - 300;
-	float yPos = m_WindowHeight / 2;
+	float xPos = m_WindowWidth - 300.0f;
+	float yPos = m_WindowHeight / 2.0f;
 	float size = 30.0f;
 	float radius = size / 2.0f;
 
@@ -75,6 +78,14 @@ void Pool::InitGame() // Ball and stick setup
 
 	// Cue Stick
 	m_Stick.CreateGameObject(&m_CueTex, 625.0f, 25.0f);
+
+	// Pool Table
+	m_Table.CreateGameObject(&m_TableTex, (float)m_WindowWidth, (float)m_WindowHeight);
+}
+
+void Pool::SetTable()
+{
+	// TODO - setup the table
 }
 
 void Pool::ResetGame()
@@ -101,7 +112,7 @@ void Pool::BallCollision(Ball& ballA, Ball& ballB) // Subtract the distance betw
 	glm::vec2 dist = ballB.m_Pos - ballA.m_Pos;
 	float R = ballB.m_Radius + ballA.m_Radius;
 
-	float magDist = sqrtf( powf(dist.x, 2) + powf(dist.y, 2) );
+	float magDist = sqrtf(powf(dist.x, 2) + powf(dist.y, 2));
 
 	glm::vec2 forceA(0);
 	glm::vec2 forceB(0);
@@ -136,22 +147,6 @@ void Pool::UpdateStickPosition()
 	m_Stick.RotateStick(angle, m_Balls[m_Cue].m_Pos, m_MousePos);
 }
 
-float Pool::GetMouseAngle()
-{
-	double xMouse, yMouse;
-	glfwGetCursorPos(m_Window, &xMouse, &yMouse); // Returns coordinates relative to top left corner of window...
-	// ...so we must make it relative to the bottom left corner, since this is the origin according to the projection matrix
-	yMouse = m_WindowHeight - yMouse;
-
-	m_MousePos = { (float)xMouse, (float)yMouse };
-	
-	// Find the distance from the mouse to the cue ball
-	float xDiff = (float)xMouse - m_Balls[m_Cue].m_Pos.x;
-	float yDiff = (float)yMouse - m_Balls[m_Cue].m_Pos.y;
-
-	return atan2f(yDiff, xDiff);
-}
-
 void Pool::HitCueBall()
 {
 	float angle = m_Stick.m_Angle;
@@ -160,6 +155,24 @@ void Pool::HitCueBall()
 	float y = m_Stick.m_Force * sin(angle);
 
 	m_Balls[m_Cue].m_Vel = { x, y };
+}
+
+float Pool::GetMouseAngle()
+{
+	double xMouse, yMouse;
+	glfwGetCursorPos(m_Window, &xMouse, &yMouse); // Returns coordinates relative to top left corner of window...
+	// ...so we must make it relative to the bottom left corner, since this is the origin according to the projection matrix
+	yMouse = m_WindowHeight - yMouse;
+
+	m_MousePos = { (float)xMouse, (float)yMouse };
+
+	std::cout << xMouse << ' ' << yMouse << "\n\n";
+	
+	// Find the distance from the mouse to the cue ball
+	float xDiff = (float)xMouse - m_Balls[m_Cue].m_Pos.x;
+	float yDiff = (float)yMouse - m_Balls[m_Cue].m_Pos.y;
+
+	return atan2f(yDiff, xDiff);
 }
 
 void Pool::SetMVP(GameObject& object)
@@ -171,6 +184,9 @@ void Pool::SetMVP(GameObject& object)
 void Pool::DrawPool()
 {
 	m_Shader.Bind();
+
+	SetMVP(m_Table);
+	m_Table.Draw();
 
 	float time = (float)glfwGetTime();
 	m_DeltaTime = time - m_LastFrame;
@@ -197,7 +213,6 @@ void Pool::DrawPool()
 			m_Moving = true;
 			ballCount = 0;
 		}
-
 		m_Moving = (m_Moving == false && ballCount == m_Balls.size()) ? false : true;
 
 		SetMVP(m_Balls[i]);
@@ -238,6 +253,5 @@ void Pool::DrawPool()
 		SetMVP(m_Stick);
 		m_Stick.Draw();
 	}
-
 	m_Shader.Unbind();
 }

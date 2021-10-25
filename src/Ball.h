@@ -16,16 +16,13 @@ public:
 	~Ball() = default;
 
 	void CreateBall(Texture* tex, float radius, float xPos, float yPos, BallColor color);
-	void SetPosition(float x, float y);
 	void ResetPosition();
-	glm::vec2 GetPosition() const { return m_Pos; }
 
 public:
-	float m_Mass = 1.0f; // kgs
+	float m_Mass = 1.0f;
 	float m_Radius = 0;
 	BallColor m_Color;
 	glm::vec2 m_StartPos = { 0, 0 };
-	glm::vec2 m_Pos   = { 0, 0 };
 	glm::vec2 m_Vel   = { 0, 0 };
 	glm::vec2 m_Momen = { 0, 0 };
 };
