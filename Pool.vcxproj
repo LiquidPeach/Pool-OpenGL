@@ -153,7 +153,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="glad.c" />
+    <ClCompile Include="Dependencies\glad\glad.c" />
     <ClCompile Include="src\Ball.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
@@ -161,6 +161,7 @@
     <ClCompile Include="src\Pool.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Stick.cpp" />
+    <ClCompile Include="src\Table.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\vendor\stb\stb_image.cpp" />
     <ClCompile Include="src\VertexArray.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="src\Pool.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Stick.h" />
+    <ClInclude Include="src\Table.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\vendor\stb\stb_image.h" />
     <ClInclude Include="src\VertexArray.h" />
