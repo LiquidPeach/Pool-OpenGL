@@ -119,5 +119,11 @@
     <Image Include="res\stick.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\table_layout.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\tableLayout.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

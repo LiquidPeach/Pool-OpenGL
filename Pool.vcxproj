@@ -192,6 +192,8 @@
     <Image Include="res\redBall.png" />
     <Image Include="res\stick.png" />
     <Image Include="res\table.png" />
+    <Image Include="res\tableLayout.png" />
+    <Image Include="res\table_layout.png" />
     <Image Include="res\whiteBall.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
