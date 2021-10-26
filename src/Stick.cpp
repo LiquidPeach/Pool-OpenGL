@@ -71,7 +71,7 @@ void Stick::PullStick(glm::vec2 mouse)
 	if (ballDistDiff >= 0 && distFromClick <= 100.0f)
 	{
 		m_Pos = m_TempPos;
-		m_Force = ballDistDiff * 15.0f;
+		m_Force = ballDistDiff * 13.5f;
 	}
 	m_Model = glm::translate(glm::mat4(1.0f), glm::vec3(m_Pos, 0));
 	m_Model *= glm::rotate(glm::mat4(1.0f), m_Angle, glm::vec3(0.0f, 0.0f, 1.0f));
