@@ -20,11 +20,12 @@ public:
 	void SetTable();
 	void ResetGame();
 
-	void WallCollision(Ball& ball);
+	void BumperCollision(Ball& ball);
 	void BallCollision(Ball& ballA, Ball& ballB);
 	void UpdateBallPosition(Ball& ball, float deltaTime);
 	void UpdateStickPosition();
 	void HitCueBall();
+	bool GoalCheck(const Ball& ball);
 
 	float GetMouseAngle();
 	void SetMVP(GameObject& object);
@@ -38,6 +39,7 @@ private:
 	float m_DeltaTime = 0;
 	float m_LastFrame = 0;
 	bool  m_Moving = false;
+	bool  m_Goal = false;
 
 	// Index of the cue and black ball in the array of Balls
 	int m_Cue = 0;
