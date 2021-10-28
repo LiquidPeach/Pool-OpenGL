@@ -5,14 +5,15 @@
 class VertexBuffer {
 public:
 	VertexBuffer() = default;
-	~VertexBuffer();
-
+	~VertexBuffer()
+	{
+		glDeleteBuffers(GL_ARRAY_BUFFER, &m_BufferID);
+		m_BufferID = 0;
+	}
 	GLsizeiptr GetSize() const { return m_Size; }
-
 	void CreateBuffer(float* vertices, GLsizeiptr size);
 	void Bind() const;
 	void Unbind() const;
-	void DeleteBuffer() const;
 
 private:
 	unsigned int m_BufferID = 0;

@@ -6,11 +6,7 @@ class Texture {
 public:
 	Texture() = default;
 	~Texture();
-
 	void CreateTexture(const char* path);
-	int GetWidth() const { return m_Width; }
-	int GetHeight() const { return m_Height; }
-
 	void Bind(unsigned int slot = 0) const;
 	void Unbind() const;
 	void DeleteTexture() const;

@@ -1,10 +1,5 @@
 #include "VertexBuffer.h"
 
-VertexBuffer::~VertexBuffer() 
-{
-	glDeleteBuffers(GL_ARRAY_BUFFER, &m_BufferID);
-}
-
 void VertexBuffer::CreateBuffer(float* vertices, GLsizeiptr size)
 {
 	m_Size = size;
@@ -21,9 +16,4 @@ void VertexBuffer::Bind() const
 void VertexBuffer::Unbind() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void VertexBuffer::DeleteBuffer() const
-{
-	glDeleteBuffers(GL_ARRAY_BUFFER, &m_BufferID);
 }

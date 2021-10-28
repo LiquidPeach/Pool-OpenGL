@@ -1,10 +1,5 @@
 #include "IndexBuffer.h"
 
-IndexBuffer::~IndexBuffer()
-{
-	glDeleteBuffers(GL_ELEMENT_ARRAY_BUFFER, &m_BufferID);
-}
-
 void IndexBuffer::CreateBuffer(unsigned int* indices, GLsizeiptr size)
 {
 	m_Size = size;

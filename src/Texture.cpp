@@ -1,11 +1,11 @@
 #include "Texture.h"
-
 #include <glad/glad.h>
 #include <stb/stb_image.h>
 
-Texture::~Texture() 
+Texture::~Texture()
 {
 	glDeleteTextures(1, &m_RenderID);
+	m_RenderID = 0;
 }
 
 void Texture::CreateTexture(const char* path) 

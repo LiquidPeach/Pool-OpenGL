@@ -1,13 +1,14 @@
 #include "VertexArray.h"
+#include <glad/glad.h>
 
 VertexArray::VertexArray()
 {
 	glGenVertexArrays(1, &m_ArrayID);
 }
-
 VertexArray::~VertexArray()
 {
 	glDeleteVertexArrays(1, &m_ArrayID);
+	m_ArrayID = 0;
 }
 
 void VertexArray::LinkAttributes(const VertexBuffer& VBO, unsigned int layout, int size, GLenum type, GLsizei stride, const void* offset)
@@ -26,9 +27,4 @@ void VertexArray::Bind() const
 void VertexArray::Unbind() const
 {
 	glBindVertexArray(0);
-}
-
-void VertexArray::DeleteArray() const
-{
-	glDeleteVertexArrays(1, &m_ArrayID);
 }
