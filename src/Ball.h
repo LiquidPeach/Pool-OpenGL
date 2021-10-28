@@ -19,10 +19,8 @@ public:
 	void ResetPosition();
 
 public:
-	float m_Mass = 1.0f;
 	float m_Radius = 0;
 	BallColor m_Color;
 	glm::vec2 m_StartPos = { 0, 0 };
-	glm::vec2 m_Vel   = { 0, 0 };
-	glm::vec2 m_Momen = { 0, 0 };
+	glm::vec2 m_Vel = { 0, 0 };
 };

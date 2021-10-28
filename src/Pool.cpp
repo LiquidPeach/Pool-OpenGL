@@ -2,6 +2,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include <GLFW/glfw3.h>
 #include <math.h>
+#include <algorithm>
 
 Pool::Pool(GLFWwindow* window, unsigned int windowWidth, unsigned int windowHeight)
 	: m_View(0), m_Proj(0)
@@ -20,9 +21,19 @@ Pool::Pool(GLFWwindow* window, unsigned int windowWidth, unsigned int windowHeig
 	m_TableTex.CreateTexture("res/table.png");
 
 	SetProjection();
+
+	for (int i = 0; i < 16; i++)
+	{
+		std::unique_ptr<Ball> b = std::make_unique<Ball>();
+		m_Balls.push_back(std::move(b));
+	}
 	InitGame();
 	SetTable();
+	m_BallCount = m_Balls.size();
 }
+
+Pool::~Pool()
+{}
 
 void Pool::SetProjection()
 {
@@ -45,30 +56,28 @@ void Pool::InitGame() // Ball and stick setup
 	float size = 30.0f;
 	float radius = size / 2.0f;
 
+	// Cue ball and Black ball
+	m_Balls[0]->CreateBall(&m_WhiteTex, radius, 180.0f, yPos, BallColor::WHITE);
+	m_Balls[1]->CreateBall(&m_BlackTex, radius, xPos + (size * 2), yPos, BallColor::BLACK);
 	// Row 1
-	m_Balls[0].CreateBall(&m_RedTex, radius, xPos, yPos, BallColor::RED);
+	m_Balls[2]->CreateBall(&m_RedTex, radius, xPos, yPos, BallColor::RED);
 	// Row 2
-	m_Balls[1].CreateBall(&m_BlueTex, radius, xPos + size, yPos - radius, BallColor::BLUE);
-	m_Balls[2].CreateBall(&m_RedTex, radius, xPos + size, yPos + radius, BallColor::RED);
-	// Row 3 with Black Ball
-	m_Balls[3].CreateBall(&m_BlueTex, radius, xPos + (size * 2), yPos - (radius * 2), BallColor::BLUE);
-	m_Balls[4].CreateBall(&m_BlackTex, radius, xPos + (size * 2), yPos, BallColor::BLACK);
-	m_Black = 4;
-	m_Balls[5].CreateBall(&m_RedTex, radius, xPos + (size * 2), yPos + (radius * 2), BallColor::RED);
+	m_Balls[3]->CreateBall(&m_BlueTex, radius, xPos + size, yPos - radius, BallColor::BLUE);
+	m_Balls[4]->CreateBall(&m_RedTex, radius, xPos + size, yPos + radius, BallColor::RED);
+	// Row 3. Black Ball is in this row
+	m_Balls[5]->CreateBall(&m_BlueTex, radius, xPos + (size * 2), yPos - (radius * 2), BallColor::BLUE);
+	m_Balls[6]->CreateBall(&m_RedTex, radius, xPos + (size * 2), yPos + (radius * 2), BallColor::RED);
 	// Row 4
-	m_Balls[6].CreateBall(&m_BlueTex, radius, xPos + (size * 3), yPos - (radius * 3), BallColor::BLUE);
-	m_Balls[7].CreateBall(&m_RedTex, radius, xPos + (size * 3), yPos - radius, BallColor::RED);
-	m_Balls[8].CreateBall(&m_BlueTex, radius, xPos + (size * 3), yPos + radius, BallColor::BLUE);
-	m_Balls[9].CreateBall(&m_RedTex, radius, xPos + (size * 3), yPos + (radius * 3), BallColor::RED);
+	m_Balls[7]->CreateBall(&m_BlueTex, radius, xPos + (size * 3), yPos - (radius * 3), BallColor::BLUE);
+	m_Balls[8]->CreateBall(&m_RedTex, radius, xPos + (size * 3), yPos - radius, BallColor::RED);
+	m_Balls[9]->CreateBall(&m_BlueTex, radius, xPos + (size * 3), yPos + radius, BallColor::BLUE);
+	m_Balls[10]->CreateBall(&m_RedTex, radius, xPos + (size * 3), yPos + (radius * 3), BallColor::RED);
 	// Row 5
-	m_Balls[10].CreateBall(&m_RedTex, radius, xPos + (size * 4), yPos - (radius * 4), BallColor::RED);
-	m_Balls[11].CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos - (radius * 2), BallColor::BLUE);
-	m_Balls[12].CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos, BallColor::BLUE);
-	m_Balls[13].CreateBall(&m_RedTex, radius, xPos + (size * 4), yPos + (radius * 2), BallColor::RED);
-	m_Balls[14].CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos + (radius * 4), BallColor::BLUE);
-	// Cue ball
-	m_Balls[15].CreateBall(&m_WhiteTex, radius, 180.0f, yPos, BallColor::WHITE);
-	m_Cue = 15;
+	m_Balls[11]->CreateBall(&m_RedTex, radius, xPos + (size * 4), yPos - (radius * 4), BallColor::RED);
+	m_Balls[12]->CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos - (radius * 2), BallColor::BLUE);
+	m_Balls[13]->CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos, BallColor::BLUE);
+	m_Balls[14]->CreateBall(&m_RedTex, radius, xPos + (size * 4), yPos + (radius * 2), BallColor::RED);
+	m_Balls[15]->CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos + (radius * 4), BallColor::BLUE);
 	// Cue Stick
 	m_Stick.CreateGameObject(&m_CueTex, 625.0f, 25.0f);
 	// Pool Table
@@ -97,12 +106,11 @@ void Pool::SetTable()
 void Pool::ResetGame()
 {
 	for (int i = 0; i < m_Balls.size(); i++)
-	{
-		m_Balls[i].ResetPosition();
-	}
+		m_Balls[i]->ResetPosition();
 
-	float x = m_Balls[m_Cue].m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[m_Cue].m_Radius;
-	m_Stick.SetStartPosition(x, m_Balls[m_Cue].m_Pos.y);
+	m_BallCount = m_Balls.size();
+	float x = m_Balls[m_Cue]->m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[m_Cue]->m_Radius;
+	m_Stick.SetStartPosition(x, m_Balls[m_Cue]->m_Pos.y);
 }
 
 void Pool::BumperCollision(Ball& ball)
@@ -154,18 +162,17 @@ void Pool::UpdateBallPosition(Ball& ball, float deltaTime)
 	if (magVel <= 2.5f)
 		ball.m_Vel = { 0, 0 };
 
-	ball.m_Vel *= 0.9995f; // Friction
-	ball.m_Momen = ball.m_Mass * ball.m_Vel;
+	ball.m_Vel *= 0.999f;
 
-	float x = ball.m_Pos.x + ball.m_Momen.x * deltaTime;
-	float y = ball.m_Pos.y + ball.m_Momen.y * deltaTime;
+	float x = ball.m_Pos.x + ball.m_Vel.x * deltaTime;
+	float y = ball.m_Pos.y + ball.m_Vel.y * deltaTime;
 	ball.SetPosition(x, y);
 }
 
 void Pool::UpdateStickPosition()
 {
 	float angle = GetMouseAngle();
-	m_Stick.RotateStick(angle, m_Balls[m_Cue].m_Pos, m_MousePos);
+	m_Stick.RotateStick(angle, m_Balls[m_Cue]->m_Pos, m_MousePos);
 }
 
 void Pool::HitCueBall()
@@ -175,7 +182,7 @@ void Pool::HitCueBall()
 	float x = m_Stick.m_Force * cos(angle);
 	float y = m_Stick.m_Force * sin(angle);
 
-	m_Balls[m_Cue].m_Vel = { x, y };
+	m_Balls[m_Cue]->m_Vel = { x, y };
 }
 
 bool Pool::GoalCheck(const Ball& ball)
@@ -203,8 +210,8 @@ float Pool::GetMouseAngle()
 	m_MousePos = { (float)xMouse, (float)yMouse };
 
 	// Find the distance from the mouse to the cue ball
-	float xDiff = (float)xMouse - m_Balls[m_Cue].m_Pos.x;
-	float yDiff = (float)yMouse - m_Balls[m_Cue].m_Pos.y;
+	float xDiff = (float)xMouse - m_Balls[m_Cue]->m_Pos.x;
+	float yDiff = (float)yMouse - m_Balls[m_Cue]->m_Pos.y;
 
 	return atan2f(yDiff, xDiff);
 }
@@ -229,16 +236,31 @@ void Pool::DrawPool()
 	// Render Balls
 
 	int ballCount = 0;
-	for (int i = 0; i < m_Balls.size(); i++) 
+	for (int i = 0; i < m_BallCount; i++) 
 	{
-		for (int j = i + 1; j < m_Balls.size(); j++)
-			BallCollision(m_Balls[i], m_Balls[j]);
+		for (int j = i + 1; j < m_BallCount; j++)
+			BallCollision(*m_Balls[i], *m_Balls[j]);
 
-		m_Goal = GoalCheck(m_Balls[i]);
-		BumperCollision(m_Balls[i]);
-		UpdateBallPosition(m_Balls[i], m_DeltaTime);
+		if (GoalCheck(*m_Balls[i]) == true)
+		{
+			if (m_Balls[i]->m_Color == BallColor::WHITE)
+				m_Balls[i]->ResetPosition();
 
-		if (m_Balls[i].m_Vel.x == 0 && m_Balls[i].m_Vel.y == 0) 
+			else if (m_Balls[i]->m_Color == BallColor::BLACK)
+				ResetGame();
+
+			else
+			{
+				m_Balls[i]->m_Vel = { 0, 0 };
+				m_BallCount--;
+				std::swap(m_Balls[i], m_Balls[m_BallCount]);
+			}
+		}
+
+		BumperCollision(*m_Balls[i]);
+		UpdateBallPosition(*m_Balls[i], m_DeltaTime);
+
+		if (m_Balls[i]->m_Vel.x == 0 && m_Balls[i]->m_Vel.y == 0) 
 		{
 			m_Moving = false;
 			ballCount++;
@@ -248,10 +270,10 @@ void Pool::DrawPool()
 			m_Moving = true;
 			ballCount = 0;
 		}
-		m_Moving = (m_Moving == false && ballCount == m_Balls.size()) ? false : true;
+		m_Moving = (m_Moving == false && ballCount == m_BallCount) ? false : true;
 
-		SetMVP(m_Balls[i]);
-		m_Balls[i].Draw();
+		SetMVP(*m_Balls[i]);
+		m_Balls[i]->Draw();
 	}
 
 	// Render Cue Stick
@@ -275,10 +297,10 @@ void Pool::DrawPool()
 		m_Stick.m_Force = 0.0f; // Reset force back to 0 after each hit
 
 		// Set position of the cue stick and draw it
-		float x = m_Balls[m_Cue].m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[m_Cue].m_Radius;
-		m_Stick.SetStartPosition(x, m_Balls[m_Cue].m_Pos.y);
+		float x = m_Balls[m_Cue]->m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[m_Cue]->m_Radius;
+		m_Stick.SetStartPosition(x, m_Balls[m_Cue]->m_Pos.y);
 
-		glm::vec2 ballDist = m_Stick.m_Pos - m_Balls[m_Cue].m_Pos;
+		glm::vec2 ballDist = m_Stick.m_Pos - m_Balls[m_Cue]->m_Pos;
 		m_Stick.m_BallDist = sqrtf(powf(ballDist.x, 2) + powf(ballDist.y, 2));
 
 		UpdateStickPosition();

@@ -6,14 +6,16 @@
 #include "Shader.h"
 
 #include "glm/glm.hpp"
-#include <array>
+#include <vector>
+#include <memory>
 
 struct GLFWwindow;
 
 class Pool {
 public:
+	Pool() = default;
 	Pool(GLFWwindow* window, unsigned int windowWidth, unsigned int windowHeight);
-	~Pool() = default;
+	~Pool();
 
 	void SetProjection();
 	void InitGame();
@@ -39,11 +41,10 @@ private:
 	float m_DeltaTime = 0;
 	float m_LastFrame = 0;
 	bool  m_Moving = false;
-	bool  m_Goal = false;
+	size_t m_BallCount = 0;
 
 	// Index of the cue and black ball in the array of Balls
-	int m_Cue = 0;
-	int m_Black = 0;
+	unsigned int m_Cue = 0;
 
 	glm::vec2 m_MousePos = { 0, 0 };
 	glm::mat4 m_View, m_Proj;
@@ -58,5 +59,5 @@ private:
 	Shader  m_Shader;
 	Stick   m_Stick;
 	Table   m_Table;
-	std::array<Ball, 16> m_Balls;
+	std::vector<std::unique_ptr<Ball>> m_Balls;
 };

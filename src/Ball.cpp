@@ -3,11 +3,11 @@
 
 void Ball::CreateBall(Texture* tex, float radius, float xPos, float yPos, BallColor color)
 {
-	m_Color = color;
-	m_Radius = radius;
-	m_Width = radius * 2;
-	m_Height = radius * 2;
 	m_Texture = tex;
+	m_Radius  = radius;
+	m_Width   = radius * 2;
+	m_Height  = radius * 2;
+	m_Color   = color;
 
 	SetPosition(xPos, yPos);
 	m_StartPos = m_Pos;
@@ -40,5 +40,5 @@ void Ball::CreateBall(Texture* tex, float radius, float xPos, float yPos, BallCo
 void Ball::ResetPosition()
 {
 	m_Pos = m_StartPos;
-	m_Vel = m_Momen = { 0, 0 };
+	m_Vel = { 0, 0 };
 }
