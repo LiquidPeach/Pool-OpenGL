@@ -13,9 +13,8 @@ struct GLFWwindow;
 
 class Pool {
 public:
-	Pool() = default;
 	Pool(GLFWwindow* window, unsigned int windowWidth, unsigned int windowHeight);
-	~Pool();
+	~Pool() = default;
 
 	void SetProjection();
 	void InitGame();
@@ -59,5 +58,5 @@ private:
 	Shader  m_Shader;
 	Stick   m_Stick;
 	Table   m_Table;
-	std::vector<std::unique_ptr<Ball>> m_Balls;
+	std::vector<std::shared_ptr<Ball>> m_Balls;
 };

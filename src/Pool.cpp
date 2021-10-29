@@ -1,4 +1,5 @@
 #include "Pool.h"
+#include "Collision.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include <GLFW/glfw3.h>
 #include <math.h>
@@ -11,7 +12,15 @@ Pool::Pool(GLFWwindow* window, unsigned int windowWidth, unsigned int windowHeig
 	m_WindowWidth = windowWidth;
 	m_WindowHeight = windowHeight;
 
+	m_BallCount = 16;
+	for (int i = 0; i < m_BallCount; i++)
+	{
+		std::shared_ptr<Ball> b = std::make_shared<Ball>();
+		m_Balls.push_back(std::move(b));
+	}
+
 	m_Shader.CreateProgram("src/shaders/defaultVert.vert", "src/shaders/defaultFrag.frag");
+	SetProjection();
 
 	m_RedTex.CreateTexture("res/redBall.png");
 	m_BlueTex.CreateTexture("res/blueBall.png");
@@ -20,20 +29,9 @@ Pool::Pool(GLFWwindow* window, unsigned int windowWidth, unsigned int windowHeig
 	m_CueTex.CreateTexture("res/stick.png");
 	m_TableTex.CreateTexture("res/table.png");
 
-	SetProjection();
-
-	for (int i = 0; i < 16; i++)
-	{
-		std::unique_ptr<Ball> b = std::make_unique<Ball>();
-		m_Balls.push_back(std::move(b));
-	}
 	InitGame();
 	SetTable();
-	m_BallCount = m_Balls.size();
 }
-
-Pool::~Pool()
-{}
 
 void Pool::SetProjection()
 {
@@ -78,8 +76,13 @@ void Pool::InitGame() // Ball and stick setup
 	m_Balls[13]->CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos, BallColor::BLUE);
 	m_Balls[14]->CreateBall(&m_RedTex, radius, xPos + (size * 4), yPos + (radius * 2), BallColor::RED);
 	m_Balls[15]->CreateBall(&m_BlueTex, radius, xPos + (size * 4), yPos + (radius * 4), BallColor::BLUE);
+
 	// Cue Stick
 	m_Stick.CreateGameObject(&m_CueTex, 625.0f, 25.0f);
+
+	float x = m_Balls[m_Cue]->m_Pos.x - (m_Stick.GetWidth() / 2) - m_Balls[m_Cue]->m_Radius;
+	m_Stick.SetStartPosition(x, m_Balls[m_Cue]->m_Pos.y);
+
 	// Pool Table
 	m_Table.CreateGameObject(&m_TableTex, (float)m_WindowWidth, (float)m_WindowHeight);
 	m_Table.SetPosition(m_WindowWidth / 2.0f, m_WindowHeight / 2.0f);
@@ -96,11 +99,11 @@ void Pool::SetTable()
 	m_Table.m_Pockets[4] = { 450.0f, 41.0f  };
 	m_Table.m_Pockets[5] = { 45.0f,  51.0f  };
 
-	// Corners of the bounds of the table
-	m_Table.m_Corners[0] = { 43.0f,  561.0f };
-	m_Table.m_Corners[1] = { 857.0f, 561.0f };
-	m_Table.m_Corners[2] = { 857.0f, 45.0f  };
-	m_Table.m_Corners[3] = { 43.0f,  45.0f  };
+	// Bounds of the table (cushions)
+	m_Table.m_xMin = 43.0f;
+	m_Table.m_xMax = 857.0f;
+	m_Table.m_yMin = 45.0f;
+	m_Table.m_yMax = 561.0f;
 }
 
 void Pool::ResetGame()
@@ -115,25 +118,17 @@ void Pool::ResetGame()
 
 void Pool::BumperCollision(Ball& ball)
 {
-	// Bounds of the table (cushions)
-	float xMin = m_Table.m_Corners[(int)Corners::BOTTOMLEFT].x;
-	float xMax = m_Table.m_Corners[(int)Corners::BOTTOMRIGHT].x;
+	if (ball.m_Pos.x >= m_Table.m_xMax - ball.m_Radius)
+		ball.m_Vel.x *= -1;
 
-	float yMin = m_Table.m_Corners[(int)Corners::BOTTOMLEFT].y;
-	float yMax = m_Table.m_Corners[(int)Corners::TOPLEFT].y;
+	if (ball.m_Pos.x <= m_Table.m_xMin + ball.m_Radius)
+		ball.m_Vel.x *= -1;
 
-	// Check Top and Bottom
-	if (ball.m_Pos.x - ball.m_Radius >= xMin && ball.m_Pos.x + ball.m_Radius <= xMax)
-	{
-		if(ball.m_Pos.y - ball.m_Radius <= yMin || ball.m_Pos.y + ball.m_Radius >= yMax)
-			ball.m_Vel.y *= -1;
-	}
-	// Check Left and Right
-	if (ball.m_Pos.y - ball.m_Radius >= yMin && ball.m_Pos.y + ball.m_Radius <= yMax)
-	{
-		if (ball.m_Pos.x - ball.m_Radius <= xMin || ball.m_Pos.x + ball.m_Radius >= xMax)
-			ball.m_Vel.x *= -1;
-	}
+	if (ball.m_Pos.y <= m_Table.m_yMax - ball.m_Radius)
+		ball.m_Vel.y *= -1;
+
+	if (ball.m_Pos.y >= m_Table.m_yMin + ball.m_Radius)
+		ball.m_Vel.y *= -1;
 }
 
 void Pool::BallCollision(Ball& ballA, Ball& ballB) // Subtract the distance between two balls with their summed radii
@@ -238,10 +233,12 @@ void Pool::DrawPool()
 	int ballCount = 0;
 	for (int i = 0; i < m_BallCount; i++) 
 	{
-		for (int j = i + 1; j < m_BallCount; j++)
+		for (int j = i + 1; j < m_BallCount; j++) // TODO - Sweep and Prune
 			BallCollision(*m_Balls[i], *m_Balls[j]);
+		//Collision collision;
+		//collision.PossibleCollisions(m_Balls);
 
-		if (GoalCheck(*m_Balls[i]) == true)
+		if (GoalCheck(*m_Balls[i]))
 		{
 			if (m_Balls[i]->m_Color == BallColor::WHITE)
 				m_Balls[i]->ResetPosition();
@@ -260,12 +257,12 @@ void Pool::DrawPool()
 		BumperCollision(*m_Balls[i]);
 		UpdateBallPosition(*m_Balls[i], m_DeltaTime);
 
-		if (m_Balls[i]->m_Vel.x == 0 && m_Balls[i]->m_Vel.y == 0) 
+		if (m_Balls[i]->m_Vel.x == 0 && m_Balls[i]->m_Vel.y == 0)
 		{
 			m_Moving = false;
 			ballCount++;
-		} 
-		else 
+		}
+		else
 		{
 			m_Moving = true;
 			ballCount = 0;

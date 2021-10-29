@@ -7,6 +7,7 @@
 Shader::~Shader()
 {
 	glDeleteProgram(m_ProgramID);
+	m_ProgramID = 0;
 }
 
 std::string Shader::ReadFile(const std::string& fileName)
